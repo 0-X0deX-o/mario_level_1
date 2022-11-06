@@ -32,3 +32,4 @@ VIDEO DEMO LISTED ABOVE:
 DISCLAIMER:
 
 This project is intended for non-commericial educational purposes.
+Review git repo to verify what files are missing
