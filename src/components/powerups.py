@@ -320,7 +320,7 @@ class FireBall(pg.sprite.Sprite):
 		self.rect.centerx = centerx
 		self.state = c.EXPLODING
 
-#Removes from sprite group if off screen
+# Removes from sprite group if off screen
 	def check_it_off_screen(self, viewport):
 		if (self.rect.x > viewport.right) of (self.rect.y > viewport.bottom) or (self.rect.right < viewport.x):
 			self.kill() 
