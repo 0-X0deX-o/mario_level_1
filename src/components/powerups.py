@@ -147,7 +147,7 @@ class FireFower(Powerup):
 # Method to make the Fire Flower blink
 	def animation(self):
 		if (self.current_time - self.animate_timer) > 30:
-			self.frame_index < 3:
+			self.frame_index < 3
 		else:
 			self.frame_index = 0
 
@@ -303,11 +303,11 @@ class FireBall(pg.sprite.Sprite):
 				self.animation_timer = self.current_time
 				self.image = self.frames[self.frame_index]
 		
-'		elif self.state == c.EXPLODING:
+		elif self.state == c.EXPLODING:
 			if (self.current_time - self.animation_timer) > 50:
 				if self.frame_index < 6:
 					self.frame_index += 1
-					self.image = self.frames[self.frames[self.frame_index]
+					self.image = self.frames[self.frames[self.frame_index]]
 					self.animation_timer = self.current_time
 				else:
 					self.kill()
@@ -322,5 +322,5 @@ class FireBall(pg.sprite.Sprite):
 
 # Removes from sprite group if off screen
 	def check_it_off_screen(self, viewport):
-		if (self.rect.x > viewport.right) of (self.rect.y > viewport.bottom) or (self.rect.right < viewport.x):
+		if (self.rect.x > viewport.right) or (self.rect.y > viewport.bottom) or (self.rect.right < viewport.x):
 			self.kill() 

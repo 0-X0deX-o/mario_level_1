@@ -6,7 +6,7 @@ This module initialized the display and creates dictionaries of resources
 
 import os
 import pygame as pg
-from . import tools
+from tools import tools
 from . import constants as c
 
 ORIGINAL_CAPTION = c.ORIGINAL_CAPTION

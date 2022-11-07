@@ -394,5 +394,201 @@ class Mario(pg.sprit.Sprite):
 		self.check_for_special_state()
 		self.animation()
 
-
+# Determines Mario's behavior based on his state
+	def handle_state(self, keys, fire_group):
+		if self.state == c.STAND:
+			self.standing(keys, fire_group)
+		elif self.state == c.WALK:
+			self.walking(keys, fire_group)
+		elif self.state == c.JUMP:
+			self.jumping(keys, fire_group)
+		elif self.state == c.FALL:
+			self.falling(keys, fire_group)
+		elif self.state == c.DEATH_JUMP:
+			self.jumping_to_death()
+		elif self.state == c.SAMLL_TO_BIG:
+			self.changing_to_big()
+		elif self.state == c.BIG_TO_FIRE:
+			self.changing_to_fire()
+		elif self.state == c.BIG_TO_SMALL:
+			self.changing_to_small()
+		elif self.state == c.FLAGPOLE:
+			self.flag_pole_sliding()
+		elif self.state == c.BOTTOM_OF_POLE:
+			self.sitting_at_bottom_of_pole()
+		elif self.state == c.WALKING_TO_CASTLE:
+			self.walking_to_castle()
+		elif self.state == c.END_OF_LEVEL_FALL:
+			self.falling_at_end_of_level()
 	
+# This function is called if Matio is standing still
+	def standing(self, keys, fire_group):
+		self.check_to_allow_jump(keys)
+		self.check_to_allow_fireball(keys)
+
+		self.frame_index = 0
+		self.x_vel = 0
+		self.y_vel = 0
+
+		if keys[tools.keybinging['action']]:
+			if self.fire and self.allow_fireball:
+				self.shoot_fireball(fire_group)
+
+		if keys[tools..keybinging['down']]:
+			self.crouching = True
+
+		if keys[tools.keybinding['left']]:
+			self.facing_right = False
+			self.get_out_of_crouch()
+			self.state = c.WALK
+		elif keys[tools.keybinding['right']]:
+			self.facing_right = True
+			self.get_out_of_crouch()
+			self.state = c.WALK
+		elif keys[tools.keybing['jump']]:
+			if self.allow_jump:
+				if self.big:
+					setup.SFX['big_jump'].play()
+				else:
+					setup.SFX['small_jump'].play()
+				self.state = c.JUMP
+				self.y_vel = c.JUMP_VEL
+		else:
+			self.state = c.STAND
+		
+		if not keys[tools.keybinding['down']]:
+			self.get_out_of_crouch()
+# Get out of crouch
+	def get_out_of_crouch(self):
+		bottom = self.rect.bottom
+		left = self.rect.x
+		if self.facing_right:
+			self.image = self.right_frames[0]
+		else:
+			self.image = self.left_frames[0]
+		self.rect = self.image.get_rect()
+		self.rect.bottom = bottom
+		self.rect.x = left
+		self.crouching = False
+
+# Check to allow Mario to jump
+	def check_to_allow_jump(self, keys):
+		if not keys[tools.keybinding['jump']]:
+			self.allow_jump = True
+
+# Check to allow the shooting of a fireball
+	def check_to_allow_fireball(self, keys):
+		if not keys[tools.keybinding['action']]:
+			self.allow_fireball = True
+# Shoots fireball, allowing no more than two to exist at once
+	def shoot_fireball(self, powerup_group):
+		setup.SFX['fireball'].play()
+		self.fireball_count = self.count_number_of_fireballs(powerup_group)
+	
+	if (self.current_time - self.last_fireball_time) > 200:
+		if self.fireball_count < 2:
+			self.allow_fireball = False
+			powerup_group.add(
+				powerups.FireBall(self.rect.right, self.rect.y, self.facing_right))
+			self.last_fireball_time = self.current_time
+			
+			self.frame_index = 6
+			if self.facing_right:
+				self.image = self.right_frames[self.frame_index]
+			else:
+				self.image = self.left_frames[self.frame_index]
+
+# Count number of fireballs that exist in the level
+	def count_number_of_fireballs(self, powerup_group):
+		fireball_list = []
+	
+	for powerup in powerup_group:
+		if powerup.name == c.FIREBALL:
+			fireball_list.append(powerup)
+
+	return len(fireball_list)
+
+# This function is called when Mario is in a walking state.
+# It changes the frame, checks for holding down the run button,
+# checks for a jump, then adjusts that state if necessary
+	def walking(self, keys, fire_group):
+		self.check_to_allow_jump(keys)
+		self.check_to_allow_fireball(keys)
+		
+		if self.frame_index == 0:
+			self.frame_index += 1
+			self.walking_timer = self.current_time
+		else:
+			if (self.current_time - self.walking_timer > self.calculate_animation_speed()):
+				if self.frame_index < 3:
+					self.frame_index += 1
+				else:
+					self.frame_index = 1
+				
+				self.walking_timer = self.current_time
+		if keys[tools.keybinding['action']]:
+			self.max_x_vel = c.MAX_RUN_SPEED
+			self.x_accel = c.RUN_ACCEL
+			if self.fire and self.allow_fireball:
+				self.shoot_fireball(fire_group)
+		else:	
+			self.max_x_vel = c.MAX_WALK_SPEED
+			self.x_accel = c.WALK_ACCEL
+		if keys[tools.keybinding['jump']]:
+			if self.allow_jump:
+				if self.big:
+					setup.SFX['big_jump'].play()
+			else:
+				setup.SFX['small_jump'].play()
+			self.state = c.JUMP
+			if self.x_vel > 4.5 or self.x_vel < -4.5:
+				self.y_vel = c.JUMP_VEL - .5
+			else:	
+				self.y_vel = c.JUMP_VEL
+		if keys[tools.keybinding['left]]:
+			self.get_out_of_crouch()
+			self.facing_right = False
+			if self.x_vel > 0:
+				self.frame_index = 5
+				self.x_accel = c.SMALL_TURNAROUND
+			else:	
+				self.x_accel = c.WALK_ACCEL
+			
+			if self.x_vel > (self.max_x_vel * -1):
+				self.x_vel -= self.x_accel
+				if self.x_vel > -0.5:
+					self.x_vel = -0.5
+			elif self.x_vel < (self.max_x_vel * -1):
+				self.x_vel += self.x_accel
+
+		elif keys[tools.keybinding['right']]:
+			self.get_out_of_crouch()
+			self.facing_right = True
+			if self.x_vel < 0:
+				self.frame_index = 5
+				self.x_accel = c.SMALL_TURNAROUND
+			else:
+				self.x_accel = c.WALK_ACCEL
+
+			if self.x_vel < self.max_x_vel:
+				self.x_vel += self.x_accel
+				if self.x_vel < 0.5:
+					self.x_vel = 0.5
+			elif self.x_vel > self.max_x_vel:
+				self.x_vel -= self.X_accel
+		
+		else:
+			if self.facing_right:
+				if self.x_vel > 0:
+					self.x_vel -= self.x_accel
+				else:
+					self.x_vel = 0
+					self.state = c.STAND
+			else:	
+				if self.x_vel = 0
+				self.state = c.STAND
+
+# Used to make walking animation speed be in relation to Mario's x-vel	
+
+		
+					
