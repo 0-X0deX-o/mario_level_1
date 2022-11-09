@@ -1,3 +1,50 @@
+        elif (self.current_time - self.transition_timer) < 330:
+            self.image = frames[1]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 395:
+            self.image = frames[2]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 460:
+            self.image = frames[1]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 525:
+            self.image = frames[2]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 590:
+            self.image = frames[1]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 655:
+            self.image = frames[2]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 720:
+            self.image = frames[1]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 785:
+            self.image = frames[2]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 850:
+            self.image = frames[1]
+            self.hurt_invincible_check()
+            self.adjust_rect()
+        elif (self.current_time - self.transition_timer) < 915:
+            self.image = frames[2]
+            self.adjust_rect()
+            self.in_transition_state = False
+            self.state = c.WALK
+            self.big = False
+            self.transition_timer = 0
+            self.hurt_invisible_timer = 0
+            self.become_small()
+
+
     def adjust_rect(self):
         """Makes sure new Rect has the same bottom and left
         location as previous Rect"""
