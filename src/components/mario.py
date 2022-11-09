@@ -589,6 +589,165 @@ class Mario(pg.sprit.Sprite):
 				self.state = c.STAND
 
 # Used to make walking animation speed be in relation to Mario's x-vel	
+	def calculate_animation_speed(self):
+		if self.x_vel == 0:
+			animation_speed = 130
+		elif self.x_vel > 0:
+			animation_speed = 130 - (self.x_vel * (13))
+		else:
+			animation_speed = 130 - (self.x_vel * (13) * -1)
+	
+		return animation_speed
 
+# Called when Mario is in a JUMP state.
+	def jumping(self, keys, fire_group):
+		self.allow_jump = False
+		self.frame_index = 4
+		self.gravity = c.JUMP_GRAVITY
+		self.y_vel += self.gravity
+		self.check_to_allow_fireball(keys)
 		
-					
+		if self.y_vel >= 0 and self.y_vel < self.max_y_vel:
+			self.gravity = c.GRAVITY
+			self.state = c.FALL
+
+		if keys[tools.keybinding['left']]:
+			if self.x_vel < self.max_x_vel:
+				self.x_vel += self.x_accel
+
+		if keys[tools.keybinding['left']]:
+			if self.x_vel > (self.max_x_vel * -1):
+				self.x_vel -= self.x_accel
+
+		elif keys[tools.keybinding['right']]:
+			if self.x_vel < self.max_x_vel:
+				self.x_vel += self.x_accel
+		if not keys[tools.keybinding['jump']]:
+			self.gravity = c.GRAVITY
+			self.state = c.FALL
+		
+		if keys[tools.keybinding['action']]:
+			if self.fire and self.allow_fireball:
+				self.shoot_fireball(fire_group)
+		
+# Called when Mario is in a FALL state
+	def falling(self, keys, fire_group):
+		self.check_to_allow_fireball(keys)
+		if self.y_vel < c.MAX_Y_VEL:
+			self.y_vel += self.gravity
+
+		if keys[tools.keybinding['left']]:
+			if self.x_vel > (self.max_vel * - 1):
+				slef.x_vel -= slef.x_accel
+
+		elif keys[tools.keybinding['right']]:
+			if self.x_vel < self.max_x_vel:
+				self.x_vel += self.x_accel
+
+		if keys[tools.keybinding['action']]:
+			if self.fire and self.allow_fireball:
+				self.shoot_fireball(fire_group)
+
+# Called when Mario is in DEATH_JUMP state
+	def jumping_to_death(self):
+		if self.death_timer == 0:
+			self.death_timer = self.current_time
+		elif (self.current_time - self.death_timer) > 500:
+			self.rect.y += self.y_vel
+			self.y_vel += self.gravity
+
+# Used to put Mario in a DEATH_JUMP state
+	def start_death_jump(self, game_info):
+		self.dead = True
+		game_info[c.MARIO_DEAD] = True
+		self.y_vel = -11
+		self.gravity = .5
+		self.frame_index = 6
+		self.image = self.right_frames[self.frame_index]
+		self.in_transition_state = True
+
+# Changes Mario's image attribute based on time while transitioning to big
+	def changing_to_big(self):
+		self.in_transition_state = True
+
+		self.transition_timer == 0:
+			self.transition_timer = self.current_time
+		elif selftimer_between_these_two_times(135, 200):
+			self.set_mario_to_middle_image()
+		elif self.timer_between_these_two_times(200, 365):
+			self.set_mario_to_small_image()
+		elif self.timer_between_these_two_times(365, 430):
+			self.set_mario_to_middle_image()
+		elif self.timer_between_these_two_times(430, 495):
+			self.set_mario_to_small_image()
+		elif self.timer_between_these_two_times(495, 560):
+			self.set_mario_top_middle_image()
+		elif self.timer_between_these_two_times(560, 625):	
+			self.set_mario_to_big_image()
+		elif self.timer_between_these_two_times(625, 690):
+			self.set_mario_to_small_image()
+		elif self.timer_between_these_two_times(690, 755):
+			self.set_mario_to_middle_image()
+		elif self.timer_between_these_two_times(755, 820):
+			self.set_mario_to_big_image
+		elif self.timer_between_these_two_times(820, 885):
+			self.set_mario_to_small_image()
+		elif self.timer_between_these_two_times(885, 950):
+			self.set_mario_to_big_image()
+			self.state = c.WALK
+			self.in_transition_state = False
+			self.transitition_timer = 0
+			self.become_big()
+
+# Checks if the timer is at the right time for the actions. Reduces the ugly code.
+	def timer_between_these_two_times(self, start_time, end_time)L
+		if (self.current_time - self.transition_timer) >= start_time and (self.current_time - self.transition_timer) < end_time:
+		return True
+
+# During a change from small to big, sets mario's image to the transition/middle size
+	def set_mario_to_middle_image(self):
+		if self.facing_right:
+			self.image = self.normal_small_frames[0][7]
+		else:
+			self.image = self.normal_small_framwes[1][7]
+		bottom = self.rect.bottom
+		centerx = self.rect.centerx
+		self.rect = self.image.get_rect()
+		self.rect.bottom = bottom
+		self.rect.centerx = centerx
+
+# During a change from small to big, sets mario's image to small
+	def set_mario_to_small_image(self):
+		if self.facing_right:
+			self.image = self.normal_small_frames[0][0]
+		else:
+			self.image = self.normal_small_frames[1][0]
+		bottom = self.rect.bottom
+		centerx = self.rect.centerx
+		self.rect = self.image.get_rect()
+		self.rect.bottom = bottom
+		self.rect.centerx = centerx
+
+# During a change from small to big, sets mario's image to big
+	def set_mario_to_big_image(self):
+		if self.facing_right:
+			self.iamge = self.normal_big_frame[0][0]
+		else:
+			self.image = self.normal_big_frames[1][0]
+		bottom = self.rect.bottom
+		centerx = self.rect.centerx
+		self.rect = self.image.get_rect()
+		self.rect.bottom = bottom
+		self.rect.centerx = centerx
+
+	def become_big(self):
+		self.big = True
+		self.right_frames = self.left_big_normal_frames
+		bottom = self.rect.bottom
+		left = self.rect.x
+		image = self.right_frames[0]
+		self.rect = image.get_rect()
+		self.rect.bottom = bottom
+		self.rect.x. = left
+
+	
